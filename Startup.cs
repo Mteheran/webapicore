@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -11,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using webapicore.Services;
+using weapicore.Middlewares;
 
 namespace webapicore
 {
@@ -27,7 +29,7 @@ namespace webapicore
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddScoped<IDataService>(p=> new DataService(3));
+            services.AddTransient<IDataService>(p=> new DataService(3));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -46,8 +48,24 @@ namespace webapicore
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapGet("/myendpoint", async context => 
+                {
+                    await context.Response.WriteAsync("Hola desde myendpoint");
+                });
+
                 endpoints.MapControllers();
             });
+
+            //app.UseWelcomePage();
+
+            app.UseParameterMiddleware();
+
+            //app.Run(async p=>  
+            //{
+            //  await p.Response.WriteAsync("Hola desde middleware");
+            //});
+
+            
         }
     }
 }
